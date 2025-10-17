@@ -3,282 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Captcha Solver App</title>
+    <title>Display File Content</title>
     <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --primary-color: #2c2c2c;
-            --secondary-color: #3e3e3e;
-            --accent-color: #00aaff;
-            --accent-hover-color: #0088cc;
-            --text-color: #e0e0e0;
-            --success-color: #4CAF50;
-            --error-color: #F44336;
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .container {
-            background-color: var(--primary-color);
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            border: 1px solid var(--secondary-color);
+            background-color: #f8f9fa;
+            color: #212529;
         }
-
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
         h1 {
-            color: var(--text-color);
+            color: #343a40;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
             margin-top: 0;
-            margin-bottom: 2rem;
-            font-weight: 600;
         }
-
-        .captcha-area {
-            background-color: var(--secondary-color);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 1.5rem;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #captchaCanvas {
-            border-radius: 6px;
-            background-color: #fff;
-        }
-
-        #refreshBtn {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 50%;
-            transition: background-color 0.2s, transform 0.2s;
-        }
-        
-        #refreshBtn svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--text-color);
-            transition: transform 0.5s;
-        }
-        
-        #refreshBtn:hover svg {
-              transform: rotate(180deg);
-        }
-
-        #refreshBtn:active {
-            transform: translateY(-50%) scale(0.9);
-        }
-
-        .solver-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .main-action {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        
-        button:active {
-            transform: scale(0.98);
-        }
-
-        #solveBtn {
-            background-color: var(--accent-color);
-            color: white;
-            font-weight: bold;
-        }
-
-        #solveBtn:hover {
-            background-color: var(--accent-hover-color);
-        }
-
-        .result-area {
-            margin-top: 1.5rem;
-            background-color: var(--secondary-color);
-            padding: 15px;
-            border-radius: 8px;
-            min-height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        #resultText {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--success-color);
-            letter-spacing: 2px;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        
-        .loader {
-            border: 4px solid var(--secondary-color);
-            border-top: 4px solid var(--accent-color);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
+        pre {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 1rem;
+            white-space: pre-wrap;      /* CSS3 */
+            white-space: -moz-pre-wrap; /* Firefox */
+            white-space: -pre-wrap;     /* Opera <7 */
+            white-space: -o-pre-wrap;   /* Opera 7 */
+            word-wrap: break-word;      /* IE */
+            font-size: 0.95em;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Captcha Solver</h1>
-
-        <div class="captcha-area">
-            <canvas id="captchaCanvas" width="200" height="70"></canvas>
-            <button id="refreshBtn" title="Generate New Captcha">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" /></svg>
-            </button>
-        </div>
-
-        <div class="solver-controls">
-            <div class="main-action">
-                <button id="solveBtn">Solve Captcha</button>
-            </div>
-            
-            <div class="result-area">
-                <div id="loader" class="loader hidden"></div>
-                <p id="resultText"></p>
-            </div>
-        </div>
+        <h1>Content of <code>helloworld.txt</code></h1>
+        <pre id="file-content-display"></pre>
     </div>
 
     <script>
+        // This function runs when the entire HTML document has been loaded and parsed.
         document.addEventListener('DOMContentLoaded', () => {
-            const captchaCanvas = document.getElementById('captchaCanvas');
-            const ctx = captchaCanvas.getContext('2d');
-            const refreshBtn = document.getElementById('refreshBtn');
-            const solveBtn = document.getElementById('solveBtn');
-            const resultText = document.getElementById('resultText');
-            const loader = document.getElementById('loader');
+            // In a single HTML file setup, we simulate the 'helloworld.txt' file
+            // by defining its content in a JavaScript string.
+            const helloworld_txt_content = `Hello, World!
 
-            let currentCaptchaText = '';
+This is the content from the simulated 'helloworld.txt' file.
+It's embedded directly within the HTML's script tag.
 
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+This demonstrates a basic way to dynamically display data on a webpage without needing to fetch external files.
 
-            function generateCaptcha() {
-                let captcha = '';
-                for (let i = 0; i < 6; i++) {
-                    captcha += characters.charAt(Math.floor(Math.random() * characters.length));
-                }
-                currentCaptchaText = captcha;
-                drawCaptcha(captcha);
-                resultText.textContent = ''; // Clear previous result
+- Line 1
+- Line 2
+- And a final line.
+`;
+
+            // Find the <pre> element by its ID.
+            const displayElement = document.getElementById('file-content-display');
+
+            // Check if the element was found before trying to modify it.
+            if (displayElement) {
+                // Set the text content of the <pre> element to our file's content.
+                // Using .textContent is secure as it prevents HTML injection.
+                displayElement.textContent = helloworld_txt_content;
+            } else {
+                console.error("Error: The display element with ID 'file-content-display' was not found.");
             }
-
-            function drawCaptcha(text) {
-                const { width, height } = captchaCanvas;
-                ctx.clearRect(0, 0, width, height);
-                ctx.fillStyle = '#f9f9f9';
-                ctx.fillRect(0, 0, width, height);
-                
-                // Draw noise lines
-                for (let i = 0; i < 5; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(Math.random() * width, Math.random() * height);
-                    ctx.lineTo(Math.random() * width, Math.random() * height);
-                    ctx.strokeStyle = `rgba(0,0,0,${Math.random() * 0.3 + 0.1})`;
-                    ctx.stroke();
-                }
-
-                // Draw characters
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-                    ctx.save();
-                    const fontSize = Math.random() * 10 + 25; // Random font size
-                    const angle = (Math.random() * 0.5) - 0.25; // Random angle
-                    const x = 20 + i * 25 + Math.random() * 5 - 2.5;
-                    const y = height / 2 + Math.random() * 10 - 5;
-                    
-                    ctx.translate(x, y);
-                    ctx.rotate(angle);
-                    
-                    ctx.font = `${fontSize}px ${['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'][Math.floor(Math.random()*5)]}`;
-                    ctx.fillStyle = `rgb(${Math.random()*100}, ${Math.random()*100}, ${Math.random()*100})`;
-                    ctx.fillText(char, 0, 0);
-                    
-                    ctx.restore();
-                }
-                
-                // Draw noise dots
-                 for (let i = 0; i < 50; i++) {
-                    ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.5})`;
-                    ctx.beginPath();
-                    ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 1.5, 0, 2 * Math.PI);
-                    ctx.fill();
-                }
-            }
-            
-            function handleSolve() {
-                resultText.classList.add('hidden');
-                loader.classList.remove('hidden');
-                
-                // Simulate processing time
-                const processingTime = Math.random() * 1500 + 500; // 0.5s to 2s
-                
-                setTimeout(() => {
-                    loader.classList.add('hidden');
-                    resultText.textContent = currentCaptchaText;
-                    resultText.classList.remove('hidden');
-                }, processingTime);
-            }
-
-            refreshBtn.addEventListener('click', generateCaptcha);
-            solveBtn.addEventListener('click', handleSolve);
-
-            // Initial generation
-            generateCaptcha();
         });
     </script>
 
